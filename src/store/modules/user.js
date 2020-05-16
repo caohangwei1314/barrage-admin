@@ -1,5 +1,7 @@
 import { login } from '@/api/login'
+import * as users from '@/api/users'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import store from '../../store'
 
 const user = {
   state: {
@@ -9,6 +11,9 @@ const user = {
   mutations: {
     SET_TOKEN: (state, token) => {
       state.token = token
+    },
+    SET_STATUS: (state, status) => {
+      state.status = status
     }
   },
 
@@ -19,12 +24,17 @@ const user = {
       return new Promise((resolve, reject) => {
         login(username, userInfo.password).then(response => {
           switch (response.code) {
-            case 1:
+            case 0:
+              store.state.token = response.data
               setToken(response.data)
               commit('SET_TOKEN', response.data)
+              users.detail().then(result => {
+                commit('SET_STATUS', result.data.status)
+              })
               resolve(response)
+              console.log(store.state.status)
               break
-            case 0:
+            case 1:
               resolve(response)
               break
             default:

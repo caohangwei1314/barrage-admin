@@ -14,9 +14,11 @@ import store from './store'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+import GLOBAL from '@/global/global.js'
 
 Vue.use(ElementUI, { locale })
 
+Vue.prototype.GLOBAL = GLOBAL
 Vue.config.productionTip = false
 
 new Vue({

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-// in development-env not use lazy-loading, because lazy-loading too many pages will cause webpack hot update too slow. so only in production use lazy-loading;
+// in development-env not use lazy-loading, because lazy-loading too many pages will cause webpack hot update too slow. so only in animeion use lazy-loading;
 // detail: https://panjiachen.github.io/vue-element-admin-site/#/lazy-loading
 
 Vue.use(Router)
@@ -21,26 +21,110 @@ import Layout from '../views/layout/Layout'
     icon: 'svg-name'             the icon show in the sidebar,
   }
 **/
+
 export const constantRouterMap = [
   { path: '/', component: () => import('@/views/login/index'), hidden: true },
   { path: '/404', component: () => import('@/views/404'), hidden: true },
 
-  // {
-  //   path: '/',
-  //   component: Layout,
-  //   redirect: '/dashboard',
-  //   name: 'Dashboard',
-  //   hidden: true,
-  //   children: [{
-  //     path: 'dashboard',
-  //     component: () => import('@/views/dashboard/index')
-  //   }]
-  // },
+  {
+    path: '/index',
+    component: Layout,
+    redirect: '/dashboard',
+    name: 'Dashboard',
+    hidden: true,
+    children: [{
+      path: 'dashboard',
+      component: () => import('@/views/dashboard/index')
+    }]
+  },
+  {
+    path: '/animeManage',
+    component: Layout,
+    redirect: '/animeManage/index',
+    meta: { title: '番剧管理', icon: 'case' },
+    children: [
+      {
+        path: 'index',
+        name: 'animes',
+        component: () => import('@/views/animeManage/index'),
+        meta: { title: '全部番剧', icon: 'case' }
+      },
+      {
+        path: 'series',
+        name: 'animesSeries',
+        hidden: true,
+        component: () => import('@/views/animeManage/animeSeries'),
+        meta: { title: '番剧集数', icon: 'case' }
+      },
+      {
+        path: 'create',
+        name: 'CreateAnime',
+        component: () => import('@/views/animeManage/create'),
+        meta: { title: '添加番剧', icon: 'edit' }
+      },
+      {
+        path: 'update',
+        name: 'UpdateAnime',
+        hidden: true,
+        component: () => import('@/views/animeManage/update'),
+        meta: { title: '修改番剧信息' }
+      },
+      {
+        path: 'animeSeriesCreate',
+        name: 'CreateAnimeSeries',
+        component: () => import('@/views/animeManage/animeSeriesCreate'),
+        hidden: true,
+        meta: { title: '添加番剧集数', icon: 'edit' }
+      },
+      {
+        path: 'animeSeriesUpdate',
+        name: 'UpdateAnimeSeries',
+        hidden: true,
+        component: () => import('@/views/animeManage/animeSeriesUpdate'),
+        meta: { title: '修改番剧集数信息' }
+      },
+      {
+        path: 'video',
+        name: 'animeVideo',
+        hidden: true,
+        component: () => import('@/views/animeManage/video'),
+        meta: { title: '视频' }
+      }
+    ]
+  },
+  {
+    path: '/danmakuManage',
+    component: Layout,
+    redirect: '/danmakuManage/index',
+    meta: { title: '弹幕管理', icon: 'user' },
+    children: [
+      {
+        path: 'index',
+        name: 'Danmaku',
+        component: () => import('@/views/danmakuManage/index'),
+        meta: { title: '弹幕管理', icon: 'case' }
+      }
+    ]
+  },
+  {
+    path: '/userManage',
+    component: Layout,
+    redirect: '/userManage/index',
+    meta: { title: '用户管理', icon: 'user' },
+    children: [
+      {
+        path: 'index',
+        name: 'Danmaku',
+        component: () => import('@/views/userManage/index'),
+        meta: { title: '用户管理', icon: 'case' }
+      }
+    ]
+  },
   {
     path: '/userUploadVideoManage',
     component: Layout,
     redirect: '/userManage/index',
-    meta: { title: '用户管理', icon: 'user' },
+    meta: { title: '内容审核', icon: 'user' },
     children: [
       {
         path: 'index',
@@ -55,10 +139,10 @@ export const constantRouterMap = [
       //   meta: { title: '添加用户', icon: 'edit' }
       // },
       {
-        path: 'update/:id',
+        path: 'update',
         name: 'UpdateUser',
         hidden: true,
-        component: () => import('@/views/userManage/update'),
+        component: () => import('@/views/userUploadVideoManage/update'),
         meta: { title: '修改用户信息' }
       }
     ]
@@ -91,56 +175,29 @@ export const constantRouterMap = [
   //   ]
   // },
   // {
-  //   path: '/productClassManage',
+  //   path: '/animeClassManage',
   //   component: Layout,
-  //   redirect: '/productClassManage/index',
+  //   redirect: '/animeClassManage/index',
   //   meta: { title: '商品类别管理', icon: 'case' },
   //   children: [
   //     {
   //       path: 'index',
-  //       name: 'ProductClasses',
-  //       component: () => import('@/views/productClassManage/index'),
+  //       name: 'animeClasses',
+  //       component: () => import('@/views/animeClassManage/index'),
   //       meta: { title: '商品类别', icon: 'case' }
   //     },
   //     {
   //       path: 'create',
-  //       name: 'CreateProductClass',
-  //       component: () => import('@/views/productClassManage/create'),
+  //       name: 'CreateanimeClass',
+  //       component: () => import('@/views/animeClassManage/create'),
   //       meta: { title: '添加商品类别', icon: 'edit' }
   //     },
   //     {
   //       path: 'update/:id',
-  //       name: 'UpdateProductClass',
+  //       name: 'UpdateanimeClass',
   //       hidden: true,
-  //       component: () => import('@/views/productClassManage/update'),
+  //       component: () => import('@/views/animeClassManage/update'),
   //       meta: { title: '修改商品类别' }
-  //     }
-  //   ]
-  // },
-  // {
-  //   path: '/productManage',
-  //   component: Layout,
-  //   redirect: '/productManage/index',
-  //   meta: { title: '商品管理', icon: 'case' },
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       name: 'Products',
-  //       component: () => import('@/views/productManage/index'),
-  //       meta: { title: '全部商品', icon: 'case' }
-  //     },
-  //     {
-  //       path: 'create',
-  //       name: 'CreateProduct',
-  //       component: () => import('@/views/productManage/create'),
-  //       meta: { title: '添加商品', icon: 'edit' }
-  //     },
-  //     {
-  //       path: 'update/:id',
-  //       name: 'UpdateProduct',
-  //       hidden: true,
-  //       component: () => import('@/views/productManage/update'),
-  //       meta: { title: '修改商品信息' }
   //     }
   //   ]
   // },
@@ -173,16 +230,23 @@ export const constantRouterMap = [
   // },
 
   {
-    path: '/orderManage',
+    path: '/articlesManage',
     component: Layout,
-    redirect: '/orderManage/index',
-    meta: { title: '用户视频评论审核', icon: 'products' },
+    redirect: '/articlesManage/index',
+    meta: { title: '内容审核审核', icon: 'case' },
     children: [
       {
         path: 'index',
         name: 'Orders',
         component: () => import('@/views/userArticlesManage/index'),
-        meta: { title: '用户视频评论审核', icon: 'products' }
+        meta: { title: '用户视频评论审核', icon: 'case' }
+      },
+      {
+        path: 'detail',
+        name: 'Detail',
+        hidden: true,
+        component: () => import('@/views/userArticlesManage/detail'),
+        meta: { title: '用户视频评论详情', icon: 'case' }
       }
     ]
   },

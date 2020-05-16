@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container" style="margin-bottom:20px">
-      <el-input v-model="listQuery.name" placeholder="标题" style="width: 200px;" class="filter-item" clearable @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.search" placeholder="标题" style="width: 200px;" class="filter-item" clearable @keyup.enter.native="handleFilter"/>
       <!-- <el-select v-model="listQuery.classId" placeholder="类别" clearable class="filter-item" style="width: 180px">
         <el-option v-for="item in productsClasses" :key="item.key" :label="item.display_name" :value="item.key"/>
       </el-select> -->
@@ -15,47 +15,28 @@
       border
       fit
       highlight-current-row>
-      <el-table-column align="center" label="编号" width="95">
+      <el-table-column align="center" label="弹幕id" width="95">
         <template slot-scope="scope">
           {{ scope.row.id }}
         </template>
       </el-table-column>
-       <el-table-column label="商品名" align="center">
+      <el-table-column label="发送用户" align="center" width="200">
         <template slot-scope="scope">
-          <span class="link-type" @click="handleUpdate(scope.row.id)">{{ scope.row.name }}</span>
+          <span class="link-type">{{ scope.row.author }}</span>
         </template>
       </el-table-column>
-      <el-table-column class-name="status-col" label="类别编号" width="110" align="center">
+       <el-table-column label="弹幕内容" align="center" width="200">
         <template slot-scope="scope">
-          <el-tag>{{ scope.row.classId }}</el-tag>
+          <span class="link-type">{{ scope.row.text }}</span>
         </template>
       </el-table-column>
-      <el-table-column class-name="status-col" label="商品图片" width="200" align="center">
+      <el-table-column label="发送时间" width="100" align="center">
         <template slot-scope="scope">
-          <img
-            :src="imgUrl+scope.row.pic"
-            width="100px"
-            height="100px"
-            @click="handlePictureCardPreview(scope.row.pic)"/>
-          <el-dialog :visible.sync="dialogVisible">
-            <img width="100%" :src="dialogImageUrl" alt="">
-          </el-dialog>
+          <span>{{ scope.row.createTime }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="商品单价" width="250" align="center">
+      <el-table-column label="操作" align="center" width="250" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <span>{{ scope.row.price }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="库存" width="200" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.storage }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row.id)">编辑</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)">删除
           </el-button>
         </template>
@@ -65,9 +46,9 @@
     <div class="pagination-container" style="margin-top:10px;">
       <el-pagination
         v-show="total>0"
-        :current-page="listQuery.page"
+        :current-page="listQuery.limit"
         :page-sizes="[10,20,30,50]"
-        :page-size="listQuery.limit"
+        :page-size="listQuery.size"
         :total="total"
         background
         layout="total, sizes, prev, pager, next, jumper"
@@ -79,8 +60,8 @@
 </template>
 
 <script>
-import * as product from '@/api/product'
 import { IMG_URL } from '@/utils/request'
+import * as danmaku from '@/api/danmaku'
 export default {
   name: 'product',
   data() {
@@ -89,10 +70,11 @@ export default {
       product: [],
       total: 0,
       listQuery: {
-        limit: 10,
-        page: 1,
-        classId: null,
-        name: null
+        size: 10,
+        limit: 1,
+        orderColumn: 'id',
+        orderDesc: 'asc',
+        search: ''
       },
       dialogVisible: false,
       dialogImageUrl: '',
@@ -105,15 +87,15 @@ export default {
       this.dialogVisible = true
     },
     handleUpdate(id) {
-      this.$router.push({ path: `/productManage/update/${id}` })
+      this.$router.push({ path: `/animeManage/update?id=${id}` })
     },
     handleDelete(id) {
-      this.$confirm('此操作将永久删除该产品, 是否继续?', '提示', {
+      this.$confirm('此操作将删除该弹幕, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        product.deleteById(id)
+        danmaku.deleted(id)
           .then((result) => {
             this.$message({
               type: 'success',
@@ -129,30 +111,36 @@ export default {
       })
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
+      this.listQuery.limit = 1
+      danmaku.page(this.listQuery).then(result => {
+        this.product = result.data.records
+        this.total = result.data.total
+        this.listQuery.size = result.data.size
+        this.listQuery.limit = result.data.current
+      })
     },
     handleCreate() {
-      this.$router.push({ name: 'CreateProduct' })
+      console.log(1)
+      this.$router.push({ name: 'CreateAnime' })
+    },
+    handleSelect(id) {
+      this.$router.push({ path: '/animeManage/series?id=' + id })
     },
     handleSizeChange(val) {
-      this.listQuery.limit = val
+      this.listQuery.size = val
       this.getList()
     },
     handleCurrentChange(val) {
-      this.listQuery.page = val
+      this.listQuery.limit = val
       this.getList()
     },
     getList() {
-      this.loading = true
-      product.query(this.listQuery)
+      danmaku.page(this.listQuery)
         .then((result) => {
-          console.log(result)
           this.product = result.data.records
           this.total = result.data.total
-          this.listQuery.limit = result.data.size
-          this.listQuery.page = result.data.current
-          this.loading = false
+          this.listQuery.size = result.data.size
+          this.listQuery.limit = result.data.current
         })
     }
   },

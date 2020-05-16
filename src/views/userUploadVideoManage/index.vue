@@ -23,8 +23,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="250" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row.id)">通过</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.row.pkId)">驳回</el-button>
+          <el-button type="success" size="mini" @click="handleSelect(scope.row.id)">查看</el-button>
+          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">通过</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row)">驳回</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -47,6 +48,7 @@
 
 <script>
 import * as users from '@/api/users'
+import * as contribution from '@/api/contribution'
 
 export default {
   name: 'Users',
@@ -71,28 +73,51 @@ export default {
     }
   },
   methods: {
-    handleUpdate(id) {
-      this.$router.push({ path: `/userManage/update/${id}` })
-    },
-    handleDelete(id) {
-      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        users.deleteById(id)
-          .then((result) => {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            this.getList()
+    handleUpdate(row) {
+      const uploadVideo = {
+        id: row.id,
+        status: 1
+      }
+      contribution.update(uploadVideo).then(result => {
+        if (result.code === 0) {
+          this.$message({
+            type: 'success',
+            message: '更新成功'
           })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
+          setTimeout(() => {
+            this.$router.go(0)
+          }, 1000)
+        } else {
+          this.$message({
+            type: 'error',
+            message: '更新失败'
+          })
+        }
+      })
+    },
+    handleSelect(id) {
+      this.$router.push({ path: '/userUploadVideoManage/update?id=' + id })
+    },
+    handleDelete(row) {
+      const uploadVideo = {
+        id: row.id,
+        status: 2
+      }
+      contribution.update(uploadVideo).then(result => {
+        if (result.code === 0) {
+          this.$message({
+            type: 'success',
+            message: '更新成功'
+          })
+          setTimeout(() => {
+            this.$router.go(0)
+          }, 1000)
+        } else {
+          this.$message({
+            type: 'error',
+            message: '更新失败'
+          })
+        }
       })
     },
     handleFilter() {

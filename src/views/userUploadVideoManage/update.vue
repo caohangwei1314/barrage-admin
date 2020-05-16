@@ -1,36 +1,22 @@
 <template>
   <div class="app-container" id="CreateNews">
-    <el-form :rules="rules" ref="form" :model="form" label-width="150px">
-      <div style="width:600px">
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="form.name"></el-input>
-        </el-form-item>
-      </div>
-      <div style="width:400px">
-        <el-form-item label="邮箱" prop="model">
-          <el-input v-model="form.email"></el-input>
-        </el-form-item>
-      </div>
-      <div style="width:400px">
-        <el-form-item label="地址" prop="model">
-          <el-input v-model="form.address"></el-input>
-        </el-form-item>
-      </div>
-      <div style="width:400px">
-        <el-form-item label="余额" prop="company">
-          <el-input v-model="form.balance"></el-input>
-        </el-form-item>
-      </div>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">保存</el-button>
-        <el-button>取消</el-button>
-      </el-form-item>
-    </el-form>
+    <h1>{{data.title}}</h1>
+    <video :src="videoUrl" controls="controls">
+    your browser does not support the video tag
+    </video>
   </div>
 </template>
 
+<style scoped>
+.app-container{
+  width: 640px;
+  margin:0 auto;
+}
+</style>
+
 <script>
 import * as users from '@/api/users'
+import * as contribution from '@/api/contribution'
 import { API_IP } from '@/utils/request'
 export default {
   name: 'CreateNews',
@@ -46,10 +32,18 @@ export default {
       rules: {
         name: [{ required: true, message: '请输入姓名', trigger: 'blur' }]
       },
-      ip: API_IP
+      ip: API_IP,
+      videoUrl: '',
+      data: {}
     }
   },
   methods: {
+    init() {
+      contribution.detail(this.$router.currentRoute.query.id).then(result => {
+        this.videoUrl = this.GLOBAL.oss + result.data.videoUrl
+        this.data = result.data
+      })
+    },
     onSubmit() {
       this.$refs['form'].validate((valid) => {
         if (valid) {
@@ -79,7 +73,7 @@ export default {
     }
   },
   created() {
-    this.getData()
+    this.init()
   }
 }
 </script>

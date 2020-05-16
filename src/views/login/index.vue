@@ -67,7 +67,8 @@ export default {
             switch (res.code) {
               case 0:
                 console.log(123)
-                this.$router.push({ path: '/userUploadVideoManage' })
+
+                this.$router.push({ path: '/userUploadVideoManage/index' })
                 break
               case 1:
                 this.$message.error(res.msg)

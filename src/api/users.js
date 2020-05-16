@@ -63,3 +63,26 @@ export function deleteById(id) {
     }
   })
 }
+
+export function page(data) {
+  return request({
+    url: '/user/page',
+    method: 'post',
+    data
+  })
+}
+
+export function updateUser(data) {
+  return request({
+    url: '/user/update',
+    method: 'put',
+    data
+  })
+}
+
+export function detail() {
+  return request({
+    url: '/user/detail',
+    method: 'get'
+  })
+}
